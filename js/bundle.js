@@ -90,8 +90,8 @@ var PreloaderScene = {
         this.load.setPreloadSprite(this.loadingBar);
 
         // TODO: load here the assets for the game
-        this.game.load.audio('sfx:pickup', 'sfx/pickup.wav');
-        this.game.load.audio('sfx:jump', 'sfx/jump.wav');
+        this.game.load.audio('sfx:pickup', 'audio/pickup.wav');
+        this.game.load.audio('sfx:jump', 'audio/jump.wav');
     },
 
     create: function () {
