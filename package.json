@@ -1,0 +1,20 @@
+{
+  "version": "0.0.0",
+  "name": "ludum-dare-40",
+  "author": "belen-albeza",
+  "license": "CC-BY-NC-SA-4.0",
+  "repository": "belen-albeza/ldjam-40",
+  "dependencies": {
+    "browserify": "*",
+    "browser-sync": "*",
+    "del": "*",
+    "gulp": "*",
+    "gulp-connect": "*",
+    "gulp-gh-pages": "*",
+    "gulp-util": "*",
+    "merge-stream": "*",
+    "phaser": "*",
+    "vinyl-source-stream": "*",
+    "watchify": "*"
+  }
+}

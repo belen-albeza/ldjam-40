@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <title>Ludum Dare #40</title>
+  <meta charset="utf-8">
+
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <style>
+      #game {
+          width: 960px;
+          height: 600px;
+          cursor: none;
+      }
+      footer {
+          width: 960px;
+      }
+  </style>
+</head>
+<body>
+    <main>
+        <iframe id="game" src="raw.html" allowfullscreen></iframe>
+    </main>
+
+    <footer>
+        <p><strong>Ludum Dare #40</strong><br>
+            by <a href="https://twitter.com/ladybenko">@ladybenko</a></p>
+            <p><button class="fullscreen" id="fullscreen"><img src="fs-icon.svg" alt="fullscreen" width="20" height="20"></button></p>
+        </footer>
+
+  <script>
+      function setElementToFullscreen(elem) {
+          let fsCall = elem.requestFullscreen || elem.mozRequestFullScreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen;
+          fsCall.apply(elem);
+      }
+      document.getElementById('fullscreen').addEventListener('click', function (e) {
+          e.preventDefault();
+          setElementToFullscreen(document.getElementById('game'));
+      });
+  </script>
+</body>
+</html>
