@@ -45,7 +45,8 @@ PlayScene.init = function () {
     this.keys = this.game.input.keyboard.addKeys({
         left: Phaser.KeyCode.LEFT,
         right: Phaser.KeyCode.RIGHT,
-        jump: Phaser.KeyCode.UP
+        jump: Phaser.KeyCode.UP,
+        ok: Phaser.KeyCode.ENTER
     });
 };
 
@@ -230,6 +231,7 @@ PlayScene._setupHud = function (group) {
     reload.events.onInputDown.add(this._reload, this);
 
     group.add(reload);
+    this.reloadButton = reload;
 };
 
 //
@@ -242,8 +244,16 @@ PlayScene._reload = function () {
     this.game.state.restart(true, false);
 };
 
+PlayScene._nextLevel = function () {
+    // TODO: nice transition
+    this.sfx.start.play();
+    this.game.state.restart(true, false);
+};
+
 PlayScene._win = function () {
     this.isVictory = true;
+    this.reloadButton.inputEnabled = false;
+
     let style = {
         font: 'Helvetica, Arial, sans-serif',
         fontSize: '80px',
@@ -252,11 +262,35 @@ PlayScene._win = function () {
     };
 
     let message = this.game.make.text(this.game.world.centerX,
-        this.game.world.centerY, "WELL DONE", style);
+        this.game.world.centerY - 50, "WELL DONE", style);
     message.anchor.set(0.5);
-    message.setShadow(5, 5, 'rgba(13, 19, 33, 0.8)', 0);
+    message.setShadow(5, 5, '#0d1321', 0);
+
+    let help = this.game.make.text(this.game.world.centerX,
+        this.game.world.centerY + 10, "PRESS <ENTER> TO CONTINUE", {
+            font: 'Helvetica, Arial, sans-serif',
+            fontSize: '20px',
+            fill: '#0d1321'
+        });
+    help.anchor.set(0.5);
+    help.setShadow(2, 2, '#fff', 0);
 
     this.hud.add(message);
+    this.hud.add(help);
+
+    message.inputEnabled = true;
+    message.input.useHandCursor = true;
+    message.events.onInputDown.add(this._nextLevel, this);
+    message.events.onInputOver.add(function () {
+        message.fill = '#0d1321';
+        message.shadowColor = 'rgba(0, 0, 0, 0)';
+    });
+    message.events.onInputOut.add(function () {
+        message.fill = '#fff';
+        message.shadowColor = '#0d1321';
+    });
+
+    this.keys.ok.onDown.addOnce(this._nextLevel, this);
 };
 
 
