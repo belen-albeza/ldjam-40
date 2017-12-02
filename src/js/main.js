@@ -30,6 +30,7 @@ var PreloaderScene = {
 
         // TODO: load here the assets for the game
         this.game.load.audio('sfx:pickup', 'sfx/pickup.wav');
+        this.game.load.audio('sfx:jump', 'sfx/jump.wav');
     },
 
     create: function () {

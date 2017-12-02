@@ -43,7 +43,8 @@ PlayScene.init = function () {
 PlayScene.create = function () {
     // setup audio sfx and bgm
     this.sfx = {
-        pickup: this.game.add.audio('sfx:pickup')
+        pickup: this.game.add.audio('sfx:pickup'),
+        jump: this.game.add.audio('sfx:jump')
     };
 
     //
@@ -123,7 +124,8 @@ PlayScene._handleInput = function () {
     const JUMP_HOLD = 200; // TODO: adjust
     // if (this.keys.jump.isDown) {
     if (this.keys.jump.downDuration(JUMP_HOLD)) {
-        this.chara.jump();
+        let didJump = this.chara.jump();
+        if (didJump) { this.sfx.jump.play(); }
     }
     else {
         this.chara.stopJumpBoost();
