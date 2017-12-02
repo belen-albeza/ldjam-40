@@ -18,15 +18,15 @@ const LEVEL_DATA = {
     pickups: [
         {x: 164, y: 576 - 16},
         {x: 196, y: 576 - 16},
-        // {x: 576, y: 576 - 16},
-        // {x: 608, y: 576 - 16},
-        // {x: 640, y: 576 - 16},
-        // {x: 672, y: 576 - 16},
-        // {x: 288, y: 440 - 16},
-        // {x: 256, y: 440 - 16},
-        // {x: 704, y: 440 - 16},
-        // {x: 736, y: 440 - 16},
-        // {x: 768, y: 440 - 16}
+        {x: 576, y: 576 - 16},
+        {x: 608, y: 576 - 16},
+        {x: 640, y: 576 - 16},
+        {x: 672, y: 576 - 16},
+        {x: 288, y: 440 - 16},
+        {x: 256, y: 440 - 16},
+        {x: 704, y: 440 - 16},
+        {x: 736, y: 440 - 16},
+        {x: 768, y: 440 - 16}
     ],
     enemies: {
         walkers: [
@@ -40,6 +40,8 @@ const LEVEL_DATA = {
 var PlayScene = {};
 
 PlayScene.init = function () {
+    this.isVictory = false;
+
     this.keys = this.game.input.keyboard.addKeys({
         left: Phaser.KeyCode.LEFT,
         right: Phaser.KeyCode.RIGHT,
@@ -86,12 +88,19 @@ PlayScene.create = function () {
 PlayScene.update = function () {
     // TODO: assert chara is alive
 
+    //
     // handle collisions
+    //
+    // physical world
     this.game.physics.arcade.collide(this.chara, this.platforms);
     this.game.physics.arcade.collide(this.enemyWalkers, this.platforms);
     this.game.physics.arcade.collide(this.enemyWalkers, this.bumpers);
+    // vs pickable objects
     this.game.physics.arcade.overlap(
         this.chara, this.pickups, this._onCharaVsPickup, null, this);
+    // vs enemies
+    this.game.physics.arcade.overlap(
+        this.chara, this.enemyWalkers, this._onCharaVsEnemy, null, this);
 
     // read input and move main character
     this._handleInput();
@@ -112,6 +121,11 @@ PlayScene._onCharaVsPickup = function (chara, pickup) {
     chara.grow();
     // TODO: grow sound play
     // TODO: update and show a counter
+};
+
+PlayScene._onCharaVsEnemy = function (chara, enemy) {
+    // TODO: actual game over state
+    this._reload();
 };
 
 //
@@ -213,11 +227,7 @@ PlayScene._setupHud = function (group) {
         reload.fill = '#fff';
         reload.shadowColor = '#bfb6b1';
     });
-    reload.events.onInputDown.add(function () {
-        // TODO: nice transition
-        this.sfx.start.play();
-        this.game.state.restart();
-    }, this);
+    reload.events.onInputDown.add(this._reload, this);
 
     group.add(reload);
 };
@@ -226,13 +236,19 @@ PlayScene._setupHud = function (group) {
 // sub-states helpers
 //
 
+PlayScene._reload = function () {
+    // TODO: nice transition
+    this.sfx.start.play();
+    this.game.state.restart(true, false);
+};
+
 PlayScene._win = function () {
     this.isVictory = true;
     let style = {
         font: 'Helvetica, Arial, sans-serif',
         fontSize: '80px',
         fontWeight: 'bold',
-        fill: '#efedef',
+        fill: '#fff',
     };
 
     let message = this.game.make.text(this.game.world.centerX,
