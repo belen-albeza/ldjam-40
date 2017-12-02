@@ -2,7 +2,7 @@
 
 const utils = require('./utils.js');
 
-const MOVE_SPEED = 300;
+const MOVE_SPEED = 400;
 const JUMP_SPEED = 600;
 
 function Chara(game, x, y) {
@@ -16,13 +16,16 @@ function Chara(game, x, y) {
     this.body.collideWorldBounds = true;
 
     this.anchor.set(0.5, 1);
+
+    this.size = 1;
+    this.speed = 1;
 }
 
 Chara.prototype = Object.create(Phaser.Sprite.prototype);
 Chara.prototype.constructor = Chara;
 
 Chara.prototype.move = function (dir) {
-    this.body.velocity.x = dir * MOVE_SPEED;
+    this.body.velocity.x = dir * MOVE_SPEED * this.speed;
 };
 
 Chara.prototype.jump = function () {
@@ -30,7 +33,7 @@ Chara.prototype.jump = function () {
     let didJump = false;
 
     if (canJump || this._isBoosting) {
-        this.body.velocity.y = -JUMP_SPEED;
+        this.body.velocity.y = -JUMP_SPEED * this.speed;
         this._isBoosting = true;
         if (canJump) {
             // TODO: play jump sfx
@@ -46,13 +49,10 @@ Chara.prototype.stopJumpBoost = function () {
     this._isBoosting = false;
 };
 
-//
-// helpers
-//
-
-// Chara.prototype._isOnAir = function () {
-//     return !this.body.touching.down;
-// };
-
+Chara.prototype.grow = function () {
+    this.size *= 1.1;
+    this.speed *= 0.9;
+    this.scale.set(this.size);
+};
 
 module.exports = Chara;

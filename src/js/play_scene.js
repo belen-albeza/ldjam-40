@@ -14,11 +14,20 @@ const LEVEL_DATA = {
         {x: 640, y: 440, width: 320, height: 24}
     ],
     pickups: [
-        {x: 64, y: 576 - 16},
-        {x: 96, y: 576 - 16}
+        {x: 164, y: 576 - 16},
+        {x: 196, y: 576 - 16},
+        {x: 576, y: 576 - 16},
+        {x: 608, y: 576 - 16},
+        {x: 640, y: 576 - 16},
+        {x: 672, y: 576 - 16},
+        {x: 288, y: 440 - 16},
+        {x: 256, y: 440 - 16},
+        {x: 704, y: 440 - 16},
+        {x: 736, y: 440 - 16},
+        {x: 768, y: 440 - 16}
     ],
-    // chara: {x: 16, y: 576}
-    chara: {x: 480, y: 576}
+    chara: {x: 16, y: 576}
+    // chara: {x: 480, y: 576}
 };
 
 var PlayScene = {};
@@ -76,6 +85,8 @@ PlayScene.update = function () {
 PlayScene._onCharaVsPickup = function (chara, pickup) {
     this.sfx.pickup.play();
     pickup.kill();
+    chara.grow();
+    // TODO: grow sound play
     // TODO: update and show a counter
 };
 
