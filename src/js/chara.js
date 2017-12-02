@@ -36,7 +36,6 @@ Chara.prototype.jump = function () {
         this.body.velocity.y = -JUMP_SPEED * this.speed;
         this._isBoosting = true;
         if (canJump) {
-            // TODO: play jump sfx
             didJump = true;
         }
     }

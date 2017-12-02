@@ -11,6 +11,7 @@ function Platform(game, x, y, width, height) {
     this.game.physics.enable(this);
     this.body.allowGravity = false;
     this.body.immovable = true;
+
 }
 
 Platform.prototype = Object.create(Phaser.Sprite.prototype);
