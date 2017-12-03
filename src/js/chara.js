@@ -40,6 +40,19 @@ Chara.prototype.jump = function () {
     return didJump;
 };
 
+Chara.prototype.die = function () {
+    this.alive = false;
+    this.body.enable = false;
+
+    this.anchor.set(0.5);
+    this.y -= 16;
+
+    this.tween = this.game.add.tween(this)
+        .to({alpha: 0, y: this.y - 150, angle: 3 * 360}, 1500, Phaser.Easing.Sinusoidal.InOut, true, 0)
+        .onComplete.addOnce(function () {
+            this.kill();
+        }, this);
+};
 
 Chara.prototype.stopJumpBoost = function () {
     this._isBoosting = false;

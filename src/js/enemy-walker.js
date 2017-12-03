@@ -21,6 +21,12 @@ Walker.prototype.update = function () {
     if (this.body.touching.left || this.body.touching.right) {
         this.turn();
     }
+    // if (this.body.blocked.left) {
+    //     this.body.velocity.x = SPEED;
+    // }
+    // else if (this.body.blocked.right) {
+    //     this.body.velocity.x = -SPEED;
+    // }
 };
 
 Walker.prototype.turn = function () {
