@@ -7,12 +7,7 @@ const MOVE_SPEED = 400;
 const JUMP_SPEED = 600;
 
 function Chara(game, x, y) {
-    // TODO: replace this with an actual sprite
-    const WIDTH = 32;
-    const HEIGHT = 32;
-    let img = utils.makeImage(game, WIDTH, HEIGHT, '#0d1321');
-
-    Phaser.Sprite.call(this, game, x, y, img);
+    Phaser.Sprite.call(this, game, x, y, game.cache.getBitmapData('chara'));
     this.game.physics.enable(this);
     this.body.collideWorldBounds = true;
 
@@ -20,6 +15,8 @@ function Chara(game, x, y) {
 
     this.size = 1;
     this.speed = 1;
+    this._wasOnAir = false;
+    this.__initialCheck = true;
 }
 
 Chara.prototype = Object.create(Phaser.Sprite.prototype);
@@ -30,7 +27,7 @@ Chara.prototype.move = function (dir) {
 };
 
 Chara.prototype.jump = function () {
-    let canJump = this.body.wasTouching.down || this.body.blocked.down;
+    let canJump = !this._isOnAir();
     let didJump = false;
 
     if (canJump || this._isBoosting) {
@@ -55,6 +52,26 @@ Chara.prototype.grow = function () {
     this.scale.set(this.size);
 };
 
+Chara.prototype.update = function () {
+    // chara just landed on the ground from a jump or fall
+    if (this._wasOnAir && !this._isOnAir()) {
+        this.tween = this.game.add.tween(this.scale)
+            .to({x: this.size * 1.2, y: this.size * 0.8}, 80, Phaser.Easing.Sinusoidal.InOut)
+            .to({x: this.size * 1, y: this.size * 1}, 80, Phaser.Easing.Sinusoidal.InOut).start();
+    }
+
+    this._wasOnAir = this.__initialCheck ? false : this._isOnAir();
+    this.__initialCheck = false;
+};
+
+//
+// helpers
+//
+
+Chara.prototype._isOnAir = function () {
+    return !this.body.wasTouching.down && !this.body.blocked.down;
+};
+
 module.exports = Chara;
 
 },{"./utils.js":7}],2:[function(require,module,exports){
@@ -65,8 +82,7 @@ const utils = require('./utils.js');
 const SPEED = 100;
 
 function Walker(game, x, y, dir) {
-    let img = utils.makeImage(game, 48, 48, '#966b9d');
-    Phaser.Sprite.call(this, game, x, y, img);
+    Phaser.Sprite.call(this, game, x, y, game.cache.getBitmapData('walker'));
 
     this.anchor.set(0.5, 1);
     this.dir = dir || 1;
@@ -95,6 +111,7 @@ module.exports = Walker;
 'use strict';
 
 var PlayScene = require('./play_scene.js');
+const utils = require('./utils.js');
 
 
 var BootScene = {
@@ -122,6 +139,14 @@ var PreloaderScene = {
         this.loadingBar.anchor.setTo(0, 0.5);
         this.load.setPreloadSprite(this.loadingBar);
 
+        // generate procedural assets
+        this.game.cache.addBitmapData('walker',
+            utils.makeImage(this.game, 48, 48, '#966b9d'));
+        this.game.cache.addBitmapData('pickup',
+            utils.makeImageCircle(this.game, 16, '#b8336a'));
+        this.game.cache.addBitmapData('chara',
+            utils.makeImage(this.game, 32, 32, '#0d1321'));
+
         // TODO: load here the assets for the game
         this.game.load.audio('sfx:pickup', 'audio/pickup.wav');
         this.game.load.audio('sfx:jump', 'audio/jump.wav');
@@ -144,14 +169,13 @@ window.onload = function () {
     game.state.start('boot');
 };
 
-},{"./play_scene.js":6}],4:[function(require,module,exports){
+},{"./play_scene.js":6,"./utils.js":7}],4:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
 
 function Pickup(game, x, y) {
-    let img = utils.makeImage(game, 16, 16, '#b8336a');
-    Phaser.Sprite.call(this, game, x, y, img);
+    Phaser.Sprite.call(this, game, x, y, game.cache.getBitmapData('pickup'));
 
     this.game.physics.enable(this);
     this.body.allowGravity = false;
@@ -161,6 +185,7 @@ function Pickup(game, x, y) {
 
 Pickup.prototype = Object.create(Phaser.Sprite.prototype);
 Pickup.prototype.constructor = Pickup;
+
 
 module.exports = Pickup;
 
@@ -205,6 +230,7 @@ const LEVEL_DATA = {
         {x: 400, y: 320, width: 160, height: 24}
     ],
     pickups: [
+        {x: 100, y: 120},
         {x: 164, y: 576 - 16},
         {x: 196, y: 576 - 16},
         {x: 576, y: 576 - 16},
@@ -267,6 +293,7 @@ PlayScene.create = function () {
     this.chara = new Chara(this.game, LEVEL_DATA.chara.x, LEVEL_DATA.chara.y);
     this.game.add.existing(this.chara);
 
+    this.game.physics.arcade.collide(this.chara, this.platforms);
     // UI
     this.hud = this.game.add.group();
     this._setupHud(this.hud);
@@ -492,6 +519,11 @@ module.exports = {
         rect.ctx.fillStyle = color;
         rect.ctx.fillRect(0, 0, width, height);
         return rect;
+    },
+    makeImageCircle: function (game, diam, color) {
+        let img = game.make.bitmapData(diam, diam);
+        img.circle(diam / 2, diam / 2, diam / 2, color);
+        return img;
     }
 }
 
