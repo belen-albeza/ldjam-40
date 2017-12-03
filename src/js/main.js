@@ -22,7 +22,6 @@ var BootScene = {
                         '#efedef'));
         this.game.cache.addBitmapData('preloader_bar',
             utils.makeImage(this.game, this.game.world.width, 8, '#0d1321'));
-        // this.game.load.image('preloader_bar', 'images/preloader_bar.png');
     },
 
     create: function () {
@@ -74,11 +73,14 @@ var PreloaderScene = {
         this.game.load.audio('sfx:jump', 'audio/jump.wav');
         this.game.load.audio('sfx:reload', 'audio/tremolo.wav');
         this.game.load.audio('sfx:death', 'audio/hurt.wav');
+        this.game.load.audio('sfx:win', 'audio/win.wav');
+        // bgm
+        this.game.load.audio('bgm:main', ['audio/bgm.ogg', 'audio/bgm.mp3']);
     },
 
     create: function () {
         this.game.state.start('title');
-        // this.game.state.start('play', true, false, 4); // start at level 1
+        // this.game.state.start('play', true, false, 1); // start at level 1
     }
 };
 

@@ -35,9 +35,19 @@ PlayScene.create = function () {
     this.sfx = {
         pickup: this.game.add.audio('sfx:pickup'),
         jump: this.game.add.audio('sfx:jump'),
-        start: this.game.add.audio('sfx:reload'),
-        death: this.game.add.audio('sfx:death')
+        death: this.game.add.audio('sfx:death'),
+        win: this.game.add.audio('sfx:win')
     };
+
+    this.song = this.game.add.audio('bgm:main');
+    if (this.song.isDecoded) {
+        this.song.loopFull();
+    }
+    else {
+        this.song.onDecoded.addOnce(function () {
+            this.song.loopFull();
+        }, this);
+    }
 
     //
     // load level and main character
@@ -74,9 +84,10 @@ PlayScene.create = function () {
     this.game.physics.arcade.gravity.y = GRAVITY;
 };
 
-// PlayScene.render = function () {
-//     this.game.debug.spriteBounds(this.tmp);
-// };
+PlayScene.shutdown = function () {
+    this.song.stop();
+}
+
 
 PlayScene.update = function () {
     //
@@ -304,7 +315,6 @@ PlayScene._changeToLevel = function (level) {
     this.camera.fade(0xefedef, 1000);
     this.camera.onFadeComplete.addOnce(function () {
         if (level > 0) { // change to indicated level
-            this.sfx.start.play();
             this.game.state.restart(true, false, level);
         }
         else { // go back to title screen -- this is on total victory
@@ -317,6 +327,13 @@ PlayScene._changeToLevel = function (level) {
 PlayScene._win = function () {
     this.isVictory = true;
     let isGameFinished = this.level === LEVEL_COUNT;
+    if (isGameFinished) {
+        this.song.fadeOut(1000);
+        this.song.onFadeComplete.addOnce(function () {
+            this.song.stop();
+        }, this);
+        this.sfx.win.play();
+    }
 
     // disable reload and control of main character
     this.reloadButton.inputEnabled = false;
