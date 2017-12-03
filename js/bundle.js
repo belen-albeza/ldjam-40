@@ -339,7 +339,7 @@ PlayScene.init = function (level) {
         right: Phaser.KeyCode.RIGHT,
         jump: Phaser.KeyCode.UP,
         ok: Phaser.KeyCode.ENTER,
-        cancel: Phaser.KeyCode.ESC
+        cancel: Phaser.KeyCode.R
     });
 
 };
@@ -622,7 +622,7 @@ PlayScene._setupHud = function (group) {
 //
 
 PlayScene._reload = function () {
-    this._changeToLevel(this.level);
+    if (!this.isVictory) { this._changeToLevel(this.level); }
 };
 
 PlayScene._nextLevel = function () {

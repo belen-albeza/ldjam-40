@@ -6,7 +6,7 @@
     "tooltips": [
         {"x": 100, "y": 300, "text": "Picking up dots\nwill make you\nbigger and heavier"},
         {"x": 776, "y": 320, "text": "Be mindful to\npick up these!"},
-        {"x": 432, "y": 32, "text": "Stuck? Hit reload and try again →\n(Or press <ESC>)"}
+        {"x": 432, "y": 32, "text": "Stuck? Hit reload and try again →\n(Or press the <R> key)"}
     ],
     "pickups": [
         {"x": 200, "y": 560},
