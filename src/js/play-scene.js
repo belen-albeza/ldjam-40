@@ -255,20 +255,28 @@ PlayScene._reload = function () {
 };
 
 PlayScene._nextLevel = function () {
-    // TODO: implement detection of total victory before trying to advance
-    this._changeToLevel(this.level + 1);
+    this._changeToLevel(this.level < LEVEL_COUNT ? this.level + 1 : -1);
 };
 
 PlayScene._changeToLevel = function (level) {
     this.camera.fade(0xefedef, 1000);
     this.camera.onFadeComplete.addOnce(function () {
-        this.sfx.start.play();
-        this.game.state.restart(true, false, level);
+        if (level > 0) { // change to indicated level
+            this.sfx.start.play();
+            this.game.state.restart(true, false, level);
+        }
+        else { // go back to title screen -- this is on total victory
+            // TODO: play total victory tune
+            this.game.state.start('title', true, false);
+        }
     }, this);
 };
 
 PlayScene._win = function () {
     this.isVictory = true;
+    let isGameFinished = this.level === LEVEL_COUNT;
+
+    // disable reload and control of main character
     this.reloadButton.inputEnabled = false;
     this.chara.freeze();
 
@@ -279,8 +287,11 @@ PlayScene._win = function () {
         fill: '#fff',
     };
 
-    let message = this.game.make.text(this.game.world.centerX,
-        this.game.world.centerY - 50, "WELL DONE", style);
+    let message = this.game.make.text(
+        this.game.world.centerX,
+        this.game.world.centerY - 50,
+        isGameFinished ? "VICTORY" : "WELL DONE",
+        style);
     message.anchor.set(0.5);
     message.setShadow(5, 5, '#0d1321', 0);
 
