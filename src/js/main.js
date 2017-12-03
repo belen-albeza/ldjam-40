@@ -1,6 +1,7 @@
 'use strict';
 
 var PlayScene = require('./play_scene.js');
+const utils = require('./utils.js');
 
 
 var BootScene = {
@@ -27,6 +28,14 @@ var PreloaderScene = {
         this.loadingBar = this.game.add.sprite(0, 240, 'preloader_bar');
         this.loadingBar.anchor.setTo(0, 0.5);
         this.load.setPreloadSprite(this.loadingBar);
+
+        // generate procedural assets
+        this.game.cache.addBitmapData('walker',
+            utils.makeImage(this.game, 48, 48, '#966b9d'));
+        this.game.cache.addBitmapData('pickup',
+            utils.makeImageCircle(this.game, 16, '#b8336a'));
+        this.game.cache.addBitmapData('chara',
+            utils.makeImage(this.game, 32, 32, '#0d1321'));
 
         // TODO: load here the assets for the game
         this.game.load.audio('sfx:pickup', 'audio/pickup.wav');

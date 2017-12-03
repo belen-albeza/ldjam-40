@@ -6,12 +6,7 @@ const MOVE_SPEED = 400;
 const JUMP_SPEED = 600;
 
 function Chara(game, x, y) {
-    // TODO: replace this with an actual sprite
-    const WIDTH = 32;
-    const HEIGHT = 32;
-    let img = utils.makeImage(game, WIDTH, HEIGHT, '#0d1321');
-
-    Phaser.Sprite.call(this, game, x, y, img);
+    Phaser.Sprite.call(this, game, x, y, game.cache.getBitmapData('chara'));
     this.game.physics.enable(this);
     this.body.collideWorldBounds = true;
 

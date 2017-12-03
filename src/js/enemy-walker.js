@@ -5,8 +5,7 @@ const utils = require('./utils.js');
 const SPEED = 100;
 
 function Walker(game, x, y, dir) {
-    let img = utils.makeImage(game, 48, 48, '#966b9d');
-    Phaser.Sprite.call(this, game, x, y, img);
+    Phaser.Sprite.call(this, game, x, y, game.cache.getBitmapData('walker'));
 
     this.anchor.set(0.5, 1);
     this.dir = dir || 1;
