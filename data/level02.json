@@ -1,12 +1,12 @@
 {
     "platforms": [
         {"x": 0, "y": 576, "width": 960, "height": 24},
-        {"x": 600, "y": 400, "width": 360, "height": 24}
+        {"x": 600, "y": 400, "width": 360, "height": 200}
     ],
     "tooltips": [
         {"x": 100, "y": 300, "text": "Picking up dots\nwill make you\nbigger and heavier"},
         {"x": 776, "y": 320, "text": "Be mindful to\npick up these!"},
-        {"x": 432, "y": 32, "text": "Stuck? Hit reload and try again →"}
+        {"x": 432, "y": 32, "text": "Stuck? Hit reload and try again →\n(Or press <ESC>)"}
     ],
     "pickups": [
         {"x": 200, "y": 560},
