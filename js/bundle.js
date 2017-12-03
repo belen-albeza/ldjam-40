@@ -166,7 +166,15 @@ var PreloaderScene = {
         this.game.cache.addBitmapData('chara',
             utils.makeImage(this.game, 32, 32, '#0d1321'));
 
-        // TODO: load here the assets for the game
+        //
+        // game assets
+        //
+
+        // json levels
+        this.game.load.json('level:1', 'data/level01.json');
+        this.game.load.json('level:2', 'data/level04.json');
+
+        // sfx
         this.game.load.audio('sfx:pickup', 'audio/pickup.wav');
         this.game.load.audio('sfx:jump', 'audio/jump.wav');
         this.game.load.audio('sfx:reload', 'audio/tremolo.wav');
@@ -174,7 +182,7 @@ var PreloaderScene = {
     },
 
     create: function () {
-        this.game.state.start('play');
+        this.game.state.start('play', true, false, 1); // start at level 1
     }
 };
 
@@ -241,41 +249,13 @@ const Pickup = require('./pickup.js');
 const EnemyWalker = require('./enemy-walker.js');
 
 const GRAVITY = 1800;
-
-const LEVEL_DATA = {
-    platforms: [
-        {x: 0, y: 576, width: 960, height: 24},
-        {x: 0, y: 440, width: 320, height: 24},
-        {x: 640, y: 440, width: 320, height: 24},
-        {x: 400, y: 320, width: 160, height: 24}
-    ],
-    pickups: [
-        {x: 100, y: 120},
-        {x: 164, y: 576 - 16},
-        {x: 196, y: 576 - 16},
-        {x: 576, y: 576 - 16},
-        {x: 608, y: 576 - 16},
-        {x: 640, y: 576 - 16},
-        {x: 672, y: 576 - 16},
-        {x: 288, y: 440 - 16},
-        {x: 256, y: 440 - 16},
-        {x: 704, y: 440 - 16},
-        {x: 736, y: 440 - 16},
-        {x: 768, y: 440 - 16}
-    ],
-    enemies: {
-        walkers: [
-            {x: 32, y: 440, dir: 1},
-        ]
-    },
-    chara: {x: 16, y: 576}
-    // chara: {x: 480, y: 576}
-};
+const LEVEL_COUNT = 2;
 
 var PlayScene = {};
 
-PlayScene.init = function () {
+PlayScene.init = function (level) {
     this.isVictory = false;
+    this.level = (level - 1) % LEVEL_COUNT + 1;
 
     this.keys = this.game.input.keyboard.addKeys({
         left: Phaser.KeyCode.LEFT,
@@ -286,6 +266,8 @@ PlayScene.init = function () {
 };
 
 PlayScene.create = function () {
+    const LEVEL_DATA = this.game.cache.getJSON(`level:${this.level}`);
+
     // setup audio sfx and bgm
     this.sfx = {
         pickup: this.game.add.audio('sfx:pickup'),
@@ -483,13 +465,14 @@ PlayScene._setupHud = function (group) {
 PlayScene._reload = function () {
     // TODO: nice transition
     this.sfx.start.play();
-    this.game.state.restart(true, false);
+    this.game.state.restart(true, false, this.level);
 };
 
 PlayScene._nextLevel = function () {
     // TODO: nice transition
     this.sfx.start.play();
-    this.game.state.restart(true, false);
+    // TODO: implement detection of total victory before trying to advance
+    this.game.state.restart(true, false, this.level + 1);
 };
 
 PlayScene._win = function () {
