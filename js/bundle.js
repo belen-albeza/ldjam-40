@@ -96,7 +96,48 @@ Chara.prototype._isOnAir = function () {
 
 module.exports = Chara;
 
-},{"./utils.js":8}],2:[function(require,module,exports){
+},{"./utils.js":9}],2:[function(require,module,exports){
+'use strict';
+
+const WIDTH = 48;
+const HEIGHT = 48;
+
+function Ghost(game, x, y, speedX, speedY) {
+    Phaser.Sprite.call(this, game, x, y, game.cache.getBitmapData('ghost'));
+
+    this.anchor.set(0.5);
+    this.alpha = 0.7;
+    this.speedX = speedX;
+    this.speedY = speedY;
+
+    this.game.physics.enable(this);
+    this.body.allowGravity = false;
+
+    this.body.velocity.x -= this.speedX;
+    this.body.velocity.y = this.speedY;
+}
+
+Ghost.prototype = Object.create(Phaser.Sprite.prototype);
+Ghost.prototype.constructor = Ghost;
+
+Ghost.prototype.update = function () {
+    if (this.x <= WIDTH / 2) {
+        this.body.velocity.x = this.speedX;
+    }
+    else if (this.x >= this.game.world.width - WIDTH / 2) {
+        this.body.velocity.x = -this.speedX;
+    }
+    if (this.y <= HEIGHT / 2) {
+        this.body.velocity.y = this.speedY;
+    }
+    else if (this.y >= this.game.world.height - HEIGHT / 2) {
+        this.body.velocity.y = -this.speedY;
+    }
+};
+
+module.exports = Ghost;
+
+},{}],3:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
@@ -135,7 +176,7 @@ Walker.prototype.turn = function () {
 
 module.exports = Walker;
 
-},{"./utils.js":8}],3:[function(require,module,exports){
+},{"./utils.js":9}],4:[function(require,module,exports){
 'use strict';
 
 var PlayScene = require('./play-scene.js');
@@ -188,6 +229,8 @@ var PreloaderScene = {
 
         this.game.cache.addBitmapData('walker',
             utils.makeImage(this.game, 48, 48, '#966b9d'));
+        this.game.cache.addBitmapData('ghost',
+            utils.makeImageCircle(this.game, 48, '#966b9d'));
         this.game.cache.addBitmapData('pickup',
             utils.makeImageCircle(this.game, 16, '#b8336a'));
         this.game.cache.addBitmapData('pickup-icon',
@@ -201,7 +244,9 @@ var PreloaderScene = {
 
         // json levels
         this.game.load.json('level:1', 'data/level01.json');
-        this.game.load.json('level:2', 'data/level04.json');
+        this.game.load.json('level:2', 'data/level02.json');
+        this.game.load.json('level:3', 'data/level03.json');
+        this.game.load.json('level:4', 'data/level04.json');
 
         // sfx
         this.game.load.audio('sfx:pickup', 'audio/pickup.wav');
@@ -212,7 +257,7 @@ var PreloaderScene = {
 
     create: function () {
         this.game.state.start('title');
-        // this.game.state.start('play', true, false, 1); // start at level 1
+        // this.game.state.start('play', true, false, 4); // start at level 1
     }
 };
 
@@ -228,7 +273,7 @@ window.onload = function () {
     game.state.start('boot');
 };
 
-},{"./play-scene.js":6,"./title-scene.js":7,"./utils.js":8}],4:[function(require,module,exports){
+},{"./play-scene.js":7,"./title-scene.js":8,"./utils.js":9}],5:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
@@ -248,7 +293,7 @@ Pickup.prototype.constructor = Pickup;
 
 module.exports = Pickup;
 
-},{"./utils.js":8}],5:[function(require,module,exports){
+},{"./utils.js":9}],6:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
@@ -270,7 +315,7 @@ Platform.prototype.constructor = Platform;
 
 module.exports = Platform;
 
-},{"./utils.js":8}],6:[function(require,module,exports){
+},{"./utils.js":9}],7:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
@@ -278,9 +323,10 @@ const Chara = require('./chara.js');
 const Platform = require('./platform.js');
 const Pickup = require('./pickup.js');
 const EnemyWalker = require('./enemy-walker.js');
+const EnemyGhost = require('./enemy-ghost.js');
 
 const GRAVITY = 1800;
-const LEVEL_COUNT = 2;
+const LEVEL_COUNT = 4;
 
 var PlayScene = {};
 
@@ -317,13 +363,22 @@ PlayScene.create = function () {
     this.background = this.game.add.image(
         0, 0, this.game.cache.getBitmapData('background'));
 
+    this.tooltips = this.game.add.group();
+    if (LEVEL_DATA.tooltips) {
+        this._spawnTooltips(this.tooltips, LEVEL_DATA.tooltips);
+    }
+
     this.platforms = this.game.add.group();
     this.bumpers = this.game.add.group();
     this._spawnPlatforms(this.platforms, this.bumpers, LEVEL_DATA.platforms);
+
     this.pickups = this.game.add.group();
     this._spawnPickups(this.pickups, LEVEL_DATA.pickups);
+
     this.enemyWalkers = this.game.add.group();
+    this.enemyGhosts = this.game.add.group();
     this._spawnWalkers(this.enemyWalkers, LEVEL_DATA.enemies.walkers);
+    this._spawnGhosts(this.enemyGhosts, LEVEL_DATA.enemies.ghosts);
 
     this.chara = new Chara(this.game, LEVEL_DATA.chara.x, LEVEL_DATA.chara.y);
     this.game.add.existing(this.chara);
@@ -355,6 +410,8 @@ PlayScene.update = function () {
     // vs enemies
     this.game.physics.arcade.overlap(
         this.chara, this.enemyWalkers, this._onCharaVsEnemy, null, this);
+    this.game.physics.arcade.overlap(
+        this.chara, this.enemyGhosts, this._onCharaVsEnemy, null, this);
 
     // read input and move main character, as long as we are not showing the
     // 'well done!' message
@@ -460,6 +517,36 @@ PlayScene._spawnWalkers = function (group, data) {
     }, this);
 };
 
+PlayScene._spawnGhosts = function (group, data) {
+    data.forEach(function (g) {
+        group.add(new EnemyGhost(this.game, g.x, g.y, g.speedX, g.speedY));
+    }, this);
+};
+
+PlayScene._spawnTooltips = function (group, data) {
+    const PADDING = 16;
+    data.forEach(function (t) {
+        let label = this.game.make.text(t.x, t.y, t.text.toUpperCase(), {
+            fontSize: '18px',
+            font: 'Helvetica, Arial, sans-serif',
+            fontWeight: 'bold',
+            fill: '#bfb6b1',
+            backgroundColor: '#fff'
+        });
+        let bubble = this.game.make.image(
+            t.x - PADDING,
+            t.y - PADDING,
+            utils.makeImage(
+                this.game,
+                label.width + PADDING * 2,
+                label.height + PADDING * 2,
+                '#ffffff')
+        );
+        group.add(bubble);
+        group.add(label);
+    }, this);
+};
+
 //
 // hud helpers
 //
@@ -528,22 +615,31 @@ PlayScene._reload = function () {
 };
 
 PlayScene._nextLevel = function () {
-    // TODO: implement detection of total victory before trying to advance
-    this._changeToLevel(this.level + 1);
+    this._changeToLevel(this.level < LEVEL_COUNT ? this.level + 1 : -1);
 };
 
 PlayScene._changeToLevel = function (level) {
     this.camera.fade(0xefedef, 1000);
     this.camera.onFadeComplete.addOnce(function () {
-        this.sfx.start.play();
-        this.game.state.restart(true, false, level);
+        if (level > 0) { // change to indicated level
+            this.sfx.start.play();
+            this.game.state.restart(true, false, level);
+        }
+        else { // go back to title screen -- this is on total victory
+            // TODO: play total victory tune
+            this.game.state.start('title', true, false);
+        }
     }, this);
 };
 
 PlayScene._win = function () {
     this.isVictory = true;
+    let isGameFinished = this.level === LEVEL_COUNT;
+
+    // disable reload and control of main character
     this.reloadButton.inputEnabled = false;
     this.chara.freeze();
+    this.game.add.tween(this.tooltips).to({alpha: 0}, 500).start();
 
     let style = {
         font: 'Helvetica, Arial, sans-serif',
@@ -552,8 +648,11 @@ PlayScene._win = function () {
         fill: '#fff',
     };
 
-    let message = this.game.make.text(this.game.world.centerX,
-        this.game.world.centerY - 50, "WELL DONE", style);
+    let message = this.game.make.text(
+        this.game.world.centerX,
+        this.game.world.centerY - 50,
+        isGameFinished ? "VICTORY" : "WELL DONE",
+        style);
     message.anchor.set(0.5);
     message.setShadow(5, 5, '#0d1321', 0);
 
@@ -587,7 +686,7 @@ PlayScene._win = function () {
 
 module.exports = PlayScene;
 
-},{"./chara.js":1,"./enemy-walker.js":2,"./pickup.js":4,"./platform.js":5,"./utils.js":8}],7:[function(require,module,exports){
+},{"./chara.js":1,"./enemy-ghost.js":2,"./enemy-walker.js":3,"./pickup.js":5,"./platform.js":6,"./utils.js":9}],8:[function(require,module,exports){
 'use strict';
 const utils = require('./utils.js');
 
@@ -643,7 +742,7 @@ TitleScene.update = function () {
 
 module.exports = TitleScene;
 
-},{"./utils.js":8}],8:[function(require,module,exports){
+},{"./utils.js":9}],9:[function(require,module,exports){
 module.exports = {
     makeImage: function (game, width, height, color) {
         let rect = game.make.bitmapData(width, height);
@@ -658,4 +757,4 @@ module.exports = {
     }
 }
 
-},{}]},{},[3]);
+},{}]},{},[4]);

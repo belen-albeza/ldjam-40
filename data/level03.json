@@ -1,0 +1,23 @@
+{
+    "platforms": [
+        {"x": 0, "y": 576, "width": 960, "height": 24},
+        {"x": 600, "y": 500, "width": 360, "height": 24}
+    ],
+    "tooltips": [
+        {"x": 100, "y": 300, "text": "Avoid enemies\nat all costs!"}
+    ],
+    "pickups": [
+        {"x": 200, "y": 560},
+        {"x": 664, "y": 484},
+        {"x": 696, "y": 484},
+        {"x": 728, "y": 484},
+        {"x": 900, "y": 560}
+    ],
+    "enemies": {
+        "walkers": [
+            {"x": 600, "y": 576, "dir": -1}
+        ],
+        "ghosts": []
+    },
+    "chara": {"x": 64, "y": 576}
+}
