@@ -8,7 +8,7 @@ const EnemyWalker = require('./enemy-walker.js');
 const EnemyGhost = require('./enemy-ghost.js');
 
 const GRAVITY = 1800;
-const LEVEL_COUNT = 2;
+const LEVEL_COUNT = 3;
 
 var PlayScene = {};
 
@@ -209,7 +209,7 @@ PlayScene._spawnTooltips = function (group, data) {
     const PADDING = 16;
     data.forEach(function (t) {
         let label = this.game.make.text(t.x, t.y, t.text.toUpperCase(), {
-            fontSize: '24px',
+            fontSize: '18px',
             font: 'Helvetica, Arial, sans-serif',
             fontWeight: 'bold',
             fill: '#bfb6b1',

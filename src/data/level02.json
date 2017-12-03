@@ -1,0 +1,24 @@
+{
+    "platforms": [
+        {"x": 0, "y": 576, "width": 960, "height": 24},
+        {"x": 600, "y": 400, "width": 360, "height": 24}
+    ],
+    "tooltips": [
+        {"x": 100, "y": 300, "text": "Picking up dots\nwill make you\nbigger and heavier"},
+        {"x": 776, "y": 320, "text": "Be mindful to\npick up these!"}
+    ],
+    "pickups": [
+        {"x": 200, "y": 560},
+        {"x": 232, "y": 560},
+        {"x": 264, "y": 560},
+        {"x": 296, "y": 560},
+        {"x": 664, "y": 384},
+        {"x": 696, "y": 384},
+        {"x": 728, "y": 384}
+    ],
+    "enemies": {
+        "walkers": [],
+        "ghosts": []
+    },
+    "chara": {"x": 64, "y": 576}
+}
