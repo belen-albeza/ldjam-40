@@ -21,7 +21,7 @@ PlayScene.init = function (level) {
         right: Phaser.KeyCode.RIGHT,
         jump: Phaser.KeyCode.UP,
         ok: Phaser.KeyCode.ENTER,
-        cancel: Phaser.KeyCode.ESC
+        cancel: Phaser.KeyCode.R
     });
 
 };
