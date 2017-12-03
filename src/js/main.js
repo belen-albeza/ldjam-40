@@ -37,7 +37,15 @@ var PreloaderScene = {
         this.game.cache.addBitmapData('chara',
             utils.makeImage(this.game, 32, 32, '#0d1321'));
 
-        // TODO: load here the assets for the game
+        //
+        // game assets
+        //
+
+        // json levels
+        this.game.load.json('level:1', 'data/level01.json');
+        this.game.load.json('level:2', 'data/level04.json');
+
+        // sfx
         this.game.load.audio('sfx:pickup', 'audio/pickup.wav');
         this.game.load.audio('sfx:jump', 'audio/jump.wav');
         this.game.load.audio('sfx:reload', 'audio/tremolo.wav');
@@ -45,7 +53,7 @@ var PreloaderScene = {
     },
 
     create: function () {
-        this.game.state.start('play');
+        this.game.state.start('play', true, false, 1); // start at level 1
     }
 };
 
