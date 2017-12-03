@@ -21,9 +21,12 @@ PlayScene.init = function (level) {
         jump: Phaser.KeyCode.UP,
         ok: Phaser.KeyCode.ENTER
     });
+
 };
 
 PlayScene.create = function () {
+    this.camera.flash(0xefedef, 500);
+
     const LEVEL_DATA = this.game.cache.getJSON(`level:${this.level}`);
 
     // setup audio sfx and bgm
@@ -248,16 +251,20 @@ PlayScene._setupHud = function (group) {
 //
 
 PlayScene._reload = function () {
-    // TODO: nice transition
-    this.sfx.start.play();
-    this.game.state.restart(true, false, this.level);
+    this._changeToLevel(this.level);
 };
 
 PlayScene._nextLevel = function () {
-    // TODO: nice transition
-    this.sfx.start.play();
     // TODO: implement detection of total victory before trying to advance
-    this.game.state.restart(true, false, this.level + 1);
+    this._changeToLevel(this.level + 1);
+};
+
+PlayScene._changeToLevel = function (level) {
+    this.camera.fade(0xefedef, 1000);
+    this.camera.onFadeComplete.addOnce(function () {
+        this.sfx.start.play();
+        this.game.state.restart(true, false, level);
+    }, this);
 };
 
 PlayScene._win = function () {
