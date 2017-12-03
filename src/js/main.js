@@ -82,7 +82,7 @@ var PreloaderScene = {
 
     create: function () {
         this.game.state.start('title');
-        // this.game.state.start('play', true, false, 5); // start at level 1
+        // this.game.state.start('play', true, false, 3); // start at level 1
     }
 };
 
