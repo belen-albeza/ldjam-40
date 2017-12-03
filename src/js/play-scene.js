@@ -19,7 +19,8 @@ PlayScene.init = function (level) {
         left: Phaser.KeyCode.LEFT,
         right: Phaser.KeyCode.RIGHT,
         jump: Phaser.KeyCode.UP,
-        ok: Phaser.KeyCode.ENTER
+        ok: Phaser.KeyCode.ENTER,
+        cancel: Phaser.KeyCode.ESC
     });
 
 };
@@ -216,7 +217,9 @@ PlayScene._setupHud = function (group) {
         reload.fill = '#fff';
         reload.shadowColor = '#bfb6b1';
     });
+    // reload level by clicking this button or pressing esc
     reload.events.onInputDown.add(this._reload, this);
+    this.keys.cancel.onDown.addOnce(this._reload, this);
 
     group.add(reload);
     this.reloadButton = reload;
