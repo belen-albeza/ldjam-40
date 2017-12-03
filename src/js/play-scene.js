@@ -40,11 +40,8 @@ PlayScene.create = function () {
     //
     // load level and main character
     //
-    this.background = this.game.add.image(0, 0,
-        utils.makeImage(this.game,
-                        this.game.world.width,
-                        this.game.world.height,
-                        '#efedef'));
+    this.background = this.game.add.image(
+        0, 0, this.game.cache.getBitmapData('background'));
 
     this.platforms = this.game.add.group();
     this.bumpers = this.game.add.group();

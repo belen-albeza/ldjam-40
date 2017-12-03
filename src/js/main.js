@@ -1,6 +1,7 @@
 'use strict';
 
-var PlayScene = require('./play_scene.js');
+var PlayScene = require('./play-scene.js');
+var TitleScene = require('./title-scene.js');
 const utils = require('./utils.js');
 
 
@@ -14,7 +15,14 @@ var BootScene = {
     },
     preload: function () {
         // load here assets required for the loading screen
-        this.game.load.image('preloader_bar', 'images/preloader_bar.png');
+        this.game.cache.addBitmapData('background',
+            utils.makeImage(this.game,
+                        this.game.world.width,
+                        this.game.world.height,
+                        '#efedef'));
+        this.game.cache.addBitmapData('preloader_bar',
+            utils.makeImage(this.game, this.game.world.width, 8, '#0d1321'));
+        // this.game.load.image('preloader_bar', 'images/preloader_bar.png');
     },
 
     create: function () {
@@ -25,11 +33,21 @@ var BootScene = {
 
 var PreloaderScene = {
     preload: function () {
-        this.loadingBar = this.game.add.sprite(0, 240, 'preloader_bar');
+        this.game.add.image(0, 0, this.game.cache.getBitmapData('background'));
+        this.loadingBar = this.game.add.sprite(0, 240,
+            this.game.cache.getBitmapData('preloader_bar'));
         this.loadingBar.anchor.setTo(0, 0.5);
         this.load.setPreloadSprite(this.loadingBar);
 
+        this.game.add.text(8, 256, 'LOADING…', {
+            font: 'Helvetica, Arial, sans-serif',
+            fontSize: '32px',
+            fontWeight: 'bold',
+            fill: '#0d1321'
+        });
+
         // generate procedural assets
+
         this.game.cache.addBitmapData('walker',
             utils.makeImage(this.game, 48, 48, '#966b9d'));
         this.game.cache.addBitmapData('pickup',
@@ -55,7 +73,8 @@ var PreloaderScene = {
     },
 
     create: function () {
-        this.game.state.start('play', true, false, 1); // start at level 1
+        this.game.state.start('title');
+        // this.game.state.start('play', true, false, 1); // start at level 1
     }
 };
 
@@ -65,6 +84,7 @@ window.onload = function () {
 
     game.state.add('boot', BootScene);
     game.state.add('preloader', PreloaderScene);
+    game.state.add('title', TitleScene);
     game.state.add('play', PlayScene);
 
     game.state.start('boot');
