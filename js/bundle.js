@@ -152,6 +152,8 @@ function Walker(game, x, y, dir) {
 
     this.game.physics.enable(this);
     this.body.velocity.x = SPEED * this.dir;
+
+    this.game.add.tween(this.scale).to({x: 1.1, y: 0.9}, 500, Phaser.Easing.Sinusoidal.InOut, true, 0, -1, true);
 }
 
 Walker.prototype = Object.create(Phaser.Sprite.prototype);
@@ -161,12 +163,6 @@ Walker.prototype.update = function () {
     if (this.body.touching.left || this.body.touching.right) {
         this.turn();
     }
-    // if (this.body.blocked.left) {
-    //     this.body.velocity.x = SPEED;
-    // }
-    // else if (this.body.blocked.right) {
-    //     this.body.velocity.x = -SPEED;
-    // }
 };
 
 Walker.prototype.turn = function () {
@@ -261,7 +257,7 @@ var PreloaderScene = {
 
     create: function () {
         this.game.state.start('title');
-        // this.game.state.start('play', true, false, 5); // start at level 1
+        // this.game.state.start('play', true, false, 3); // start at level 1
     }
 };
 
