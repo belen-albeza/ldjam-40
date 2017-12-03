@@ -50,6 +50,8 @@ var PreloaderScene = {
 
         this.game.cache.addBitmapData('walker',
             utils.makeImage(this.game, 48, 48, '#966b9d'));
+        this.game.cache.addBitmapData('ghost',
+            utils.makeImageCircle(this.game, 48, '#966b9d'));
         this.game.cache.addBitmapData('pickup',
             utils.makeImageCircle(this.game, 16, '#b8336a'));
         this.game.cache.addBitmapData('pickup-icon',
@@ -73,8 +75,8 @@ var PreloaderScene = {
     },
 
     create: function () {
-        this.game.state.start('title');
-        // this.game.state.start('play', true, false, 1); // start at level 1
+        // this.game.state.start('title');
+        this.game.state.start('play', true, false, 1); // start at level 1
     }
 };
 

@@ -5,6 +5,7 @@ const Chara = require('./chara.js');
 const Platform = require('./platform.js');
 const Pickup = require('./pickup.js');
 const EnemyWalker = require('./enemy-walker.js');
+const EnemyGhost = require('./enemy-ghost.js');
 
 const GRAVITY = 1800;
 const LEVEL_COUNT = 2;
@@ -47,10 +48,14 @@ PlayScene.create = function () {
     this.platforms = this.game.add.group();
     this.bumpers = this.game.add.group();
     this._spawnPlatforms(this.platforms, this.bumpers, LEVEL_DATA.platforms);
+
     this.pickups = this.game.add.group();
     this._spawnPickups(this.pickups, LEVEL_DATA.pickups);
+
     this.enemyWalkers = this.game.add.group();
+    this.enemyGhosts = this.game.add.group();
     this._spawnWalkers(this.enemyWalkers, LEVEL_DATA.enemies.walkers);
+    this._spawnGhosts(this.enemyGhosts, LEVEL_DATA.enemies.ghosts);
 
     this.chara = new Chara(this.game, LEVEL_DATA.chara.x, LEVEL_DATA.chara.y);
     this.game.add.existing(this.chara);
@@ -82,6 +87,8 @@ PlayScene.update = function () {
     // vs enemies
     this.game.physics.arcade.overlap(
         this.chara, this.enemyWalkers, this._onCharaVsEnemy, null, this);
+    this.game.physics.arcade.overlap(
+        this.chara, this.enemyGhosts, this._onCharaVsEnemy, null, this);
 
     // read input and move main character, as long as we are not showing the
     // 'well done!' message
@@ -184,6 +191,12 @@ PlayScene._spawnPickups = function (group, data) {
 PlayScene._spawnWalkers = function (group, data) {
     data.forEach(function (w) {
         group.add(new EnemyWalker(this.game, w.x, w.y, w.dir));
+    }, this);
+};
+
+PlayScene._spawnGhosts = function (group, data) {
+    data.forEach(function (g) {
+        group.add(new EnemyGhost(this.game, g.x, g.y, g.speedX, g.speedY));
     }, this);
 };
 

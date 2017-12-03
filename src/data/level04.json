@@ -22,7 +22,8 @@
     "enemies": {
         "walkers": [
             {"x": 32, "y": 440, "dir": 1}
-        ]
+        ],
+        "ghosts": []
     },
     "chara": {"x": 16, "y": 576}
 }
