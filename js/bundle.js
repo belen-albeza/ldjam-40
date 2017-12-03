@@ -163,6 +163,8 @@ var PreloaderScene = {
             utils.makeImage(this.game, 48, 48, '#966b9d'));
         this.game.cache.addBitmapData('pickup',
             utils.makeImageCircle(this.game, 16, '#b8336a'));
+        this.game.cache.addBitmapData('pickup-icon',
+            utils.makeImageCircle(this.game, 24, '#fff'));
         this.game.cache.addBitmapData('chara',
             utils.makeImage(this.game, 32, 32, '#0d1321'));
 
@@ -305,6 +307,10 @@ PlayScene.create = function () {
     this.game.physics.arcade.gravity.y = GRAVITY;
 };
 
+// PlayScene.render = function () {
+//     this.game.debug.spriteBounds(this.tmp);
+// };
+
 PlayScene.update = function () {
     // TODO: assert chara is alive
 
@@ -326,9 +332,14 @@ PlayScene.update = function () {
     this._handleInput();
 
     // victory condition
-    if (this.pickups.countLiving() === 0 && !this.isVictory) {
+    let remaining = this.pickups.countLiving();
+    if (remaining === 0 && !this.isVictory) {
         this._win();
     }
+
+    // update pickups counter label
+    let pickedCount = this.pickups.length - remaining;
+    this.counterLabel.setText(`${pickedCount} / ${this.pickups.length} `);
 }
 
 //
@@ -456,6 +467,27 @@ PlayScene._setupHud = function (group) {
 
     group.add(reload);
     this.reloadButton = reload;
+
+    //
+    // pickups counter
+    //
+    let counterGroup = this.game.make.group();
+    counterGroup.position.set(8, 32);
+    group.add(counterGroup);
+    let icon = this.game.make.image(
+        0, -2, this.game.cache.getBitmapData('pickup-icon'));
+    icon.anchor.setTo(0, 0.5);
+    let iconShadow = this.game.make.image(
+        2, 0, this.game.cache.getBitmapData('pickup-icon'));
+    iconShadow.anchor.setTo(0, 0.5);
+    iconShadow.tint = 0xbfb6b1;
+    counterGroup.add(iconShadow);
+    counterGroup.add(icon);
+
+    this.counterLabel = this.game.make.text(32, 0, '', style);
+    this.counterLabel.setShadow(2, 2, '#bfb6b1', 0);
+    this.counterLabel.anchor.set(0, 0.5);
+    counterGroup.add(this.counterLabel);
 };
 
 //
