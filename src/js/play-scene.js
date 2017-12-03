@@ -304,7 +304,7 @@ PlayScene._setupHud = function (group) {
 //
 
 PlayScene._reload = function () {
-    this._changeToLevel(this.level);
+    if (!this.isVictory) { this._changeToLevel(this.level); }
 };
 
 PlayScene._nextLevel = function () {
