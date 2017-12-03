@@ -22,6 +22,14 @@ function Chara(game, x, y) {
 Chara.prototype = Object.create(Phaser.Sprite.prototype);
 Chara.prototype.constructor = Chara;
 
+Chara.prototype.freeze = function (dir) {
+    // stop character and disable physics
+    this.move(0);
+    this.body.enable = false;
+    this.tween = this.game.add.tween(this).to(
+        {alpha: 0}, 1000, Phaser.Easing.Sinusoidal.InOut, true, 0);
+};
+
 Chara.prototype.move = function (dir) {
     this.body.velocity.x = dir * MOVE_SPEED * this.speed;
 };
@@ -49,7 +57,8 @@ Chara.prototype.die = function () {
     this.y -= 16;
 
     this.tween = this.game.add.tween(this)
-        .to({alpha: 0, y: this.y - 150, angle: 3 * 360}, 1500, Phaser.Easing.Sinusoidal.InOut, true, 0)
+        .to({alpha: 0, y: this.y - 150, angle: 3 * 360}, 1500,
+            Phaser.Easing.Sinusoidal.InOut, true, 0)
         .onComplete.addOnce(function () {
             this.kill();
         }, this);
@@ -265,9 +274,12 @@ PlayScene.init = function (level) {
         jump: Phaser.KeyCode.UP,
         ok: Phaser.KeyCode.ENTER
     });
+
 };
 
 PlayScene.create = function () {
+    this.camera.flash(0xefedef, 500);
+
     const LEVEL_DATA = this.game.cache.getJSON(`level:${this.level}`);
 
     // setup audio sfx and bgm
@@ -312,8 +324,6 @@ PlayScene.create = function () {
 // };
 
 PlayScene.update = function () {
-    // TODO: assert chara is alive
-
     //
     // handle collisions
     //
@@ -328,8 +338,9 @@ PlayScene.update = function () {
     this.game.physics.arcade.overlap(
         this.chara, this.enemyWalkers, this._onCharaVsEnemy, null, this);
 
-    // read input and move main character
-    this._handleInput();
+    // read input and move main character, as long as we are not showing the
+    // 'well done!' message
+    if (!this.isVictory) { this._handleInput(); }
 
     // victory condition
     let remaining = this.pickups.countLiving();
@@ -369,8 +380,6 @@ PlayScene._onCharaVsEnemy = function (chara, enemy) {
 //
 
 PlayScene._handleInput = function () {
-    // TODO: make sure chara is alive
-
     // move main chara
     if (this.keys.left.isDown) { // move left
         this.chara.move(-1);
@@ -495,21 +504,26 @@ PlayScene._setupHud = function (group) {
 //
 
 PlayScene._reload = function () {
-    // TODO: nice transition
-    this.sfx.start.play();
-    this.game.state.restart(true, false, this.level);
+    this._changeToLevel(this.level);
 };
 
 PlayScene._nextLevel = function () {
-    // TODO: nice transition
-    this.sfx.start.play();
     // TODO: implement detection of total victory before trying to advance
-    this.game.state.restart(true, false, this.level + 1);
+    this._changeToLevel(this.level + 1);
+};
+
+PlayScene._changeToLevel = function (level) {
+    this.camera.fade(0xefedef, 1000);
+    this.camera.onFadeComplete.addOnce(function () {
+        this.sfx.start.play();
+        this.game.state.restart(true, false, level);
+    }, this);
 };
 
 PlayScene._win = function () {
     this.isVictory = true;
     this.reloadButton.inputEnabled = false;
+    this.chara.freeze();
 
     let style = {
         font: 'Helvetica, Arial, sans-serif',
