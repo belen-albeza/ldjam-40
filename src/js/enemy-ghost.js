@@ -8,14 +8,14 @@ function Ghost(game, x, y, speedX, speedY) {
 
     this.anchor.set(0.5);
     this.alpha = 0.7;
-    this.speedX = speedX;
-    this.speedY = speedY;
-
     this.game.physics.enable(this);
     this.body.allowGravity = false;
 
-    this.body.velocity.x -= this.speedX;
-    this.body.velocity.y = this.speedY;
+    this.body.velocity.x = speedX;
+    this.body.velocity.y = speedY;
+
+    this.speedX = Math.abs(speedX);
+    this.speedY = Math.abs(speedY);
 }
 
 Ghost.prototype = Object.create(Phaser.Sprite.prototype);
