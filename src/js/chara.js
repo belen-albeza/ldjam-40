@@ -14,6 +14,8 @@ function Chara(game, x, y) {
 
     this.size = 1;
     this.speed = 1;
+    this._wasOnAir = false;
+    this.__initialCheck = true;
 }
 
 Chara.prototype = Object.create(Phaser.Sprite.prototype);
@@ -24,7 +26,7 @@ Chara.prototype.move = function (dir) {
 };
 
 Chara.prototype.jump = function () {
-    let canJump = this.body.wasTouching.down || this.body.blocked.down;
+    let canJump = !this._isOnAir();
     let didJump = false;
 
     if (canJump || this._isBoosting) {
@@ -47,6 +49,26 @@ Chara.prototype.grow = function () {
     this.size *= 1.1;
     this.speed *= 0.9;
     this.scale.set(this.size);
+};
+
+Chara.prototype.update = function () {
+    // chara just landed on the ground from a jump or fall
+    if (this._wasOnAir && !this._isOnAir()) {
+        this.tween = this.game.add.tween(this.scale)
+            .to({x: this.size * 1.2, y: this.size * 0.8}, 80, Phaser.Easing.Sinusoidal.InOut)
+            .to({x: this.size * 1, y: this.size * 1}, 80, Phaser.Easing.Sinusoidal.InOut).start();
+    }
+
+    this._wasOnAir = this.__initialCheck ? false : this._isOnAir();
+    this.__initialCheck = false;
+};
+
+//
+// helpers
+//
+
+Chara.prototype._isOnAir = function () {
+    return !this.body.wasTouching.down && !this.body.blocked.down;
 };
 
 module.exports = Chara;

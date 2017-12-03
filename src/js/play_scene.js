@@ -79,6 +79,7 @@ PlayScene.create = function () {
     this.chara = new Chara(this.game, LEVEL_DATA.chara.x, LEVEL_DATA.chara.y);
     this.game.add.existing(this.chara);
 
+    this.game.physics.arcade.collide(this.chara, this.platforms);
     // UI
     this.hud = this.game.add.group();
     this._setupHud(this.hud);
