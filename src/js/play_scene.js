@@ -68,8 +68,6 @@ PlayScene.create = function () {
 // };
 
 PlayScene.update = function () {
-    // TODO: assert chara is alive
-
     //
     // handle collisions
     //
@@ -84,8 +82,9 @@ PlayScene.update = function () {
     this.game.physics.arcade.overlap(
         this.chara, this.enemyWalkers, this._onCharaVsEnemy, null, this);
 
-    // read input and move main character
-    this._handleInput();
+    // read input and move main character, as long as we are not showing the
+    // 'well done!' message
+    if (!this.isVictory) { this._handleInput(); }
 
     // victory condition
     let remaining = this.pickups.countLiving();
@@ -125,8 +124,6 @@ PlayScene._onCharaVsEnemy = function (chara, enemy) {
 //
 
 PlayScene._handleInput = function () {
-    // TODO: make sure chara is alive
-
     // move main chara
     if (this.keys.left.isDown) { // move left
         this.chara.move(-1);
@@ -266,6 +263,7 @@ PlayScene._nextLevel = function () {
 PlayScene._win = function () {
     this.isVictory = true;
     this.reloadButton.inputEnabled = false;
+    this.chara.freeze();
 
     let style = {
         font: 'Helvetica, Arial, sans-serif',

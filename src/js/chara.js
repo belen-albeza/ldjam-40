@@ -21,6 +21,14 @@ function Chara(game, x, y) {
 Chara.prototype = Object.create(Phaser.Sprite.prototype);
 Chara.prototype.constructor = Chara;
 
+Chara.prototype.freeze = function (dir) {
+    // stop character and disable physics
+    this.move(0);
+    this.body.enable = false;
+    this.tween = this.game.add.tween(this).to(
+        {alpha: 0}, 1000, Phaser.Easing.Sinusoidal.InOut, true, 0);
+};
+
 Chara.prototype.move = function (dir) {
     this.body.velocity.x = dir * MOVE_SPEED * this.speed;
 };
@@ -48,7 +56,8 @@ Chara.prototype.die = function () {
     this.y -= 16;
 
     this.tween = this.game.add.tween(this)
-        .to({alpha: 0, y: this.y - 150, angle: 3 * 360}, 1500, Phaser.Easing.Sinusoidal.InOut, true, 0)
+        .to({alpha: 0, y: this.y - 150, angle: 3 * 360}, 1500,
+            Phaser.Easing.Sinusoidal.InOut, true, 0)
         .onComplete.addOnce(function () {
             this.kill();
         }, this);
