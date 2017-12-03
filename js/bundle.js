@@ -96,7 +96,7 @@ Chara.prototype._isOnAir = function () {
 
 module.exports = Chara;
 
-},{"./utils.js":7}],2:[function(require,module,exports){
+},{"./utils.js":8}],2:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
@@ -135,10 +135,11 @@ Walker.prototype.turn = function () {
 
 module.exports = Walker;
 
-},{"./utils.js":7}],3:[function(require,module,exports){
+},{"./utils.js":8}],3:[function(require,module,exports){
 'use strict';
 
-var PlayScene = require('./play_scene.js');
+var PlayScene = require('./play-scene.js');
+var TitleScene = require('./title-scene.js');
 const utils = require('./utils.js');
 
 
@@ -152,7 +153,14 @@ var BootScene = {
     },
     preload: function () {
         // load here assets required for the loading screen
-        this.game.load.image('preloader_bar', 'images/preloader_bar.png');
+        this.game.cache.addBitmapData('background',
+            utils.makeImage(this.game,
+                        this.game.world.width,
+                        this.game.world.height,
+                        '#efedef'));
+        this.game.cache.addBitmapData('preloader_bar',
+            utils.makeImage(this.game, this.game.world.width, 8, '#0d1321'));
+        // this.game.load.image('preloader_bar', 'images/preloader_bar.png');
     },
 
     create: function () {
@@ -163,11 +171,21 @@ var BootScene = {
 
 var PreloaderScene = {
     preload: function () {
-        this.loadingBar = this.game.add.sprite(0, 240, 'preloader_bar');
+        this.game.add.image(0, 0, this.game.cache.getBitmapData('background'));
+        this.loadingBar = this.game.add.sprite(0, 240,
+            this.game.cache.getBitmapData('preloader_bar'));
         this.loadingBar.anchor.setTo(0, 0.5);
         this.load.setPreloadSprite(this.loadingBar);
 
+        this.game.add.text(8, 256, 'LOADING…', {
+            font: 'Helvetica, Arial, sans-serif',
+            fontSize: '32px',
+            fontWeight: 'bold',
+            fill: '#0d1321'
+        });
+
         // generate procedural assets
+
         this.game.cache.addBitmapData('walker',
             utils.makeImage(this.game, 48, 48, '#966b9d'));
         this.game.cache.addBitmapData('pickup',
@@ -193,7 +211,8 @@ var PreloaderScene = {
     },
 
     create: function () {
-        this.game.state.start('play', true, false, 1); // start at level 1
+        this.game.state.start('title');
+        // this.game.state.start('play', true, false, 1); // start at level 1
     }
 };
 
@@ -203,12 +222,13 @@ window.onload = function () {
 
     game.state.add('boot', BootScene);
     game.state.add('preloader', PreloaderScene);
+    game.state.add('title', TitleScene);
     game.state.add('play', PlayScene);
 
     game.state.start('boot');
 };
 
-},{"./play_scene.js":6,"./utils.js":7}],4:[function(require,module,exports){
+},{"./play-scene.js":6,"./title-scene.js":7,"./utils.js":8}],4:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
@@ -228,7 +248,7 @@ Pickup.prototype.constructor = Pickup;
 
 module.exports = Pickup;
 
-},{"./utils.js":7}],5:[function(require,module,exports){
+},{"./utils.js":8}],5:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
@@ -250,7 +270,7 @@ Platform.prototype.constructor = Platform;
 
 module.exports = Platform;
 
-},{"./utils.js":7}],6:[function(require,module,exports){
+},{"./utils.js":8}],6:[function(require,module,exports){
 'use strict';
 
 const utils = require('./utils.js');
@@ -272,7 +292,8 @@ PlayScene.init = function (level) {
         left: Phaser.KeyCode.LEFT,
         right: Phaser.KeyCode.RIGHT,
         jump: Phaser.KeyCode.UP,
-        ok: Phaser.KeyCode.ENTER
+        ok: Phaser.KeyCode.ENTER,
+        cancel: Phaser.KeyCode.ESC
     });
 
 };
@@ -293,11 +314,8 @@ PlayScene.create = function () {
     //
     // load level and main character
     //
-    this.background = this.game.add.image(0, 0,
-        utils.makeImage(this.game,
-                        this.game.world.width,
-                        this.game.world.height,
-                        '#efedef'));
+    this.background = this.game.add.image(
+        0, 0, this.game.cache.getBitmapData('background'));
 
     this.platforms = this.game.add.group();
     this.bumpers = this.game.add.group();
@@ -472,7 +490,9 @@ PlayScene._setupHud = function (group) {
         reload.fill = '#fff';
         reload.shadowColor = '#bfb6b1';
     });
+    // reload level by clicking this button or pressing esc
     reload.events.onInputDown.add(this._reload, this);
+    this.keys.cancel.onDown.addOnce(this._reload, this);
 
     group.add(reload);
     this.reloadButton = reload;
@@ -567,7 +587,63 @@ PlayScene._win = function () {
 
 module.exports = PlayScene;
 
-},{"./chara.js":1,"./enemy-walker.js":2,"./pickup.js":4,"./platform.js":5,"./utils.js":7}],7:[function(require,module,exports){
+},{"./chara.js":1,"./enemy-walker.js":2,"./pickup.js":4,"./platform.js":5,"./utils.js":8}],7:[function(require,module,exports){
+'use strict';
+const utils = require('./utils.js');
+
+var TitleScene = {};
+
+TitleScene.init = function () {
+    this.keys = this.game.input.keyboard.addKeys({
+        ok: Phaser.KeyCode.ENTER
+    });
+
+    this.keys.ok.onDown.addOnce(function () {
+        this.camera.fade(0xefedef, 1000);
+        this.camera.onFadeComplete.addOnce(function () {
+            this.game.state.start('play', true, false, 1); // start at level 1
+        }, this);
+    }, this);
+};
+
+TitleScene.create = function () {
+    this.game.add.image(0, 0, this.game.cache.getBitmapData('background'));
+    let band = this.game.add.image(0, this.game.world.centerY - 50,
+        utils.makeImage(this.game,
+                        this.game.world.width,
+                        Math.floor(this.game.world.height / 4),
+                        '#0d1321'));
+    band.anchor.set(0, 0.5);
+
+    let title = this.game.add.text(
+        this.game.world.centerX, this.game.world.centerY - 50, 'grooOW!', {
+            font: 'Helvetica, Arial, sans-serif',
+            fontSize: '80px',
+            fontWeight: 'bold',
+            fill: '#fff',
+            backgroundColor: '#0d1321'
+        });
+    title.anchor.set(0.5);
+    // title.setShadow(5, 5, '#0d1321', 0);
+
+    let help = this.game.add.text(this.game.world.centerX,
+        this.game.world.centerY + 64, "PRESS <ENTER> TO START", {
+            font: 'Helvetica, Arial, sans-serif',
+            fontSize: '20px',
+            fill: '#0d1321'
+        });
+    help.anchor.set(0.5);
+    help.setShadow(2, 2, '#fff', 0)
+};
+
+
+TitleScene.update = function () {
+
+};
+
+module.exports = TitleScene;
+
+},{"./utils.js":8}],8:[function(require,module,exports){
 module.exports = {
     makeImage: function (game, width, height, color) {
         let rect = game.make.bitmapData(width, height);
