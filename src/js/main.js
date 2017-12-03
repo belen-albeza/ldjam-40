@@ -34,6 +34,8 @@ var PreloaderScene = {
             utils.makeImage(this.game, 48, 48, '#966b9d'));
         this.game.cache.addBitmapData('pickup',
             utils.makeImageCircle(this.game, 16, '#b8336a'));
+        this.game.cache.addBitmapData('pickup-icon',
+            utils.makeImageCircle(this.game, 24, '#fff'));
         this.game.cache.addBitmapData('chara',
             utils.makeImage(this.game, 32, 32, '#0d1321'));
 
