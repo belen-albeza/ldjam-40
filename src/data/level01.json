@@ -2,6 +2,9 @@
     "platforms": [
         {"x": 0, "y": 576, "width": 960, "height": 24}
     ],
+    "tooltips": [
+        {"x": 100, "y": 300, "text": "Use arrow keys to move\nand jump."}
+    ],
     "pickups": [
         {"x": 164, "y": 560},
         {"x": 196, "y": 560},
@@ -14,9 +17,7 @@
     ],
     "enemies": {
         "walkers": [],
-        "ghosts": [
-            {"x": 100, "y": 100, "speedX": 200, "speedY": 100}
-        ]
+        "ghosts": []
     },
     "chara": {"x": 64, "y": 576}
 }

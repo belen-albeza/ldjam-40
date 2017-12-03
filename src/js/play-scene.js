@@ -45,6 +45,11 @@ PlayScene.create = function () {
     this.background = this.game.add.image(
         0, 0, this.game.cache.getBitmapData('background'));
 
+    this.tooltips = this.game.add.group();
+    if (LEVEL_DATA.tooltips) {
+        this._spawnTooltips(this.tooltips, LEVEL_DATA.tooltips);
+    }
+
     this.platforms = this.game.add.group();
     this.bumpers = this.game.add.group();
     this._spawnPlatforms(this.platforms, this.bumpers, LEVEL_DATA.platforms);
@@ -200,6 +205,30 @@ PlayScene._spawnGhosts = function (group, data) {
     }, this);
 };
 
+PlayScene._spawnTooltips = function (group, data) {
+    const PADDING = 16;
+    data.forEach(function (t) {
+        let label = this.game.make.text(t.x, t.y, t.text.toUpperCase(), {
+            fontSize: '24px',
+            font: 'Helvetica, Arial, sans-serif',
+            fontWeight: 'bold',
+            fill: '#bfb6b1',
+            backgroundColor: '#fff'
+        });
+        let bubble = this.game.make.image(
+            t.x - PADDING,
+            t.y - PADDING,
+            utils.makeImage(
+                this.game,
+                label.width + PADDING * 2,
+                label.height + PADDING * 2,
+                '#ffffff')
+        );
+        group.add(bubble);
+        group.add(label);
+    }, this);
+};
+
 //
 // hud helpers
 //
@@ -292,6 +321,7 @@ PlayScene._win = function () {
     // disable reload and control of main character
     this.reloadButton.inputEnabled = false;
     this.chara.freeze();
+    this.game.add.tween(this.tooltips).to({alpha: 0}, 500).start();
 
     let style = {
         font: 'Helvetica, Arial, sans-serif',
