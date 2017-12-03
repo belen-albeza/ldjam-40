@@ -8,7 +8,7 @@ const EnemyWalker = require('./enemy-walker.js');
 const EnemyGhost = require('./enemy-ghost.js');
 
 const GRAVITY = 1800;
-const LEVEL_COUNT = 3;
+const LEVEL_COUNT = 4;
 
 var PlayScene = {};
 

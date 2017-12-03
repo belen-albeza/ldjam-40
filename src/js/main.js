@@ -66,7 +66,8 @@ var PreloaderScene = {
         // json levels
         this.game.load.json('level:1', 'data/level01.json');
         this.game.load.json('level:2', 'data/level02.json');
-        this.game.load.json('level:3', 'data/level04.json');
+        this.game.load.json('level:3', 'data/level03.json');
+        this.game.load.json('level:4', 'data/level04.json');
 
         // sfx
         this.game.load.audio('sfx:pickup', 'audio/pickup.wav');
@@ -76,8 +77,8 @@ var PreloaderScene = {
     },
 
     create: function () {
-        // this.game.state.start('title');
-        this.game.state.start('play', true, false, 2); // start at level 1
+        this.game.state.start('title');
+        // this.game.state.start('play', true, false, 4); // start at level 1
     }
 };
 

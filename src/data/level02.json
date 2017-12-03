@@ -5,7 +5,8 @@
     ],
     "tooltips": [
         {"x": 100, "y": 300, "text": "Picking up dots\nwill make you\nbigger and heavier"},
-        {"x": 776, "y": 320, "text": "Be mindful to\npick up these!"}
+        {"x": 776, "y": 320, "text": "Be mindful to\npick up these!"},
+        {"x": 432, "y": 32, "text": "Stuck? Hit reload and try again →"}
     ],
     "pickups": [
         {"x": 200, "y": 560},
