@@ -41,6 +41,19 @@ Chara.prototype.jump = function () {
     return didJump;
 };
 
+Chara.prototype.die = function () {
+    this.alive = false;
+    this.body.enable = false;
+
+    this.anchor.set(0.5);
+    this.y -= 16;
+
+    this.tween = this.game.add.tween(this)
+        .to({alpha: 0, y: this.y - 150, angle: 3 * 360}, 1500, Phaser.Easing.Sinusoidal.InOut, true, 0)
+        .onComplete.addOnce(function () {
+            this.kill();
+        }, this);
+};
 
 Chara.prototype.stopJumpBoost = function () {
     this._isBoosting = false;
@@ -98,6 +111,12 @@ Walker.prototype.update = function () {
     if (this.body.touching.left || this.body.touching.right) {
         this.turn();
     }
+    // if (this.body.blocked.left) {
+    //     this.body.velocity.x = SPEED;
+    // }
+    // else if (this.body.blocked.right) {
+    //     this.body.velocity.x = -SPEED;
+    // }
 };
 
 Walker.prototype.turn = function () {
@@ -151,6 +170,7 @@ var PreloaderScene = {
         this.game.load.audio('sfx:pickup', 'audio/pickup.wav');
         this.game.load.audio('sfx:jump', 'audio/jump.wav');
         this.game.load.audio('sfx:reload', 'audio/tremolo.wav');
+        this.game.load.audio('sfx:death', 'audio/hurt.wav');
     },
 
     create: function () {
@@ -245,7 +265,7 @@ const LEVEL_DATA = {
     ],
     enemies: {
         walkers: [
-            {x: 32, y: 440, dir: 1}
+            {x: 32, y: 440, dir: 1},
         ]
     },
     chara: {x: 16, y: 576}
@@ -270,7 +290,8 @@ PlayScene.create = function () {
     this.sfx = {
         pickup: this.game.add.audio('sfx:pickup'),
         jump: this.game.add.audio('sfx:jump'),
-        start: this.game.add.audio('sfx:reload')
+        start: this.game.add.audio('sfx:reload'),
+        death: this.game.add.audio('sfx:death')
     };
 
     //
@@ -341,8 +362,13 @@ PlayScene._onCharaVsPickup = function (chara, pickup) {
 };
 
 PlayScene._onCharaVsEnemy = function (chara, enemy) {
+    this.sfx.death.play();
+    this.chara.die();
+    // undo the 'touching' so walkers don't treat the hero as a wall or bumper
+    enemy.body.touching = enemy.body.wasTouching;
+
     // TODO: actual game over state
-    this._reload();
+    this.chara.events.onKilled.addOnce(this._reload, this);
 };
 
 //
@@ -410,7 +436,7 @@ PlayScene._spawnPickups = function (group, data) {
 
 PlayScene._spawnWalkers = function (group, data) {
     data.forEach(function (w) {
-        group.add(new EnemyWalker(this.game, w.x, w.y));
+        group.add(new EnemyWalker(this.game, w.x, w.y, w.dir));
     }, this);
 };
 
