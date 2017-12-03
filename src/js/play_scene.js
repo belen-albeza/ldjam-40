@@ -13,7 +13,7 @@ var PlayScene = {};
 
 PlayScene.init = function (level) {
     this.isVictory = false;
-    this.level = (level - 1 % LEVEL_COUNT) + 1;
+    this.level = (level - 1) % LEVEL_COUNT + 1;
 
     this.keys = this.game.input.keyboard.addKeys({
         left: Phaser.KeyCode.LEFT,
@@ -229,7 +229,8 @@ PlayScene._reload = function () {
 PlayScene._nextLevel = function () {
     // TODO: nice transition
     this.sfx.start.play();
-    this.game.state.restart(true, false, this.level);
+    // TODO: implement detection of total victory before trying to advance
+    this.game.state.restart(true, false, this.level + 1);
 };
 
 PlayScene._win = function () {
