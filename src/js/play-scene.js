@@ -26,6 +26,24 @@ PlayScene.init = function (level) {
 
 };
 
+PlayScene.chromeAudioWorkAround = function() {
+    // See https://github.com/photonstorm/phaser/issues/2913
+    var buffer = this.game.sound.context.createBuffer(1, 1, 22050);
+    this._unlockSource = this.game.sound.context.createBufferSource();
+    this._unlockSource.buffer = buffer;
+    this._unlockSource.connect(this.game.sound.context.destination);
+
+    if (this._unlockSource.start === undefined) {
+        this._unlockSource.noteOn(0);
+    } else {
+        this._unlockSource.start(0);
+    }
+
+    if (this._unlockSource.context.state === 'suspended') {
+        this._unlockSource.context.resume();
+    }
+}
+
 PlayScene.create = function () {
     this.camera.flash(0xefedef, 500);
 
@@ -42,10 +60,12 @@ PlayScene.create = function () {
     this.song = this.game.add.audio('bgm:main');
     if (this.song.isDecoded) {
         this.song.loopFull();
+        this.chromeAudioWorkAround();
     }
     else {
         this.song.onDecoded.addOnce(function () {
             this.song.loopFull();
+            this.chromeAudioWorkAround();
         }, this);
     }
 
